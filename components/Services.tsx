@@ -130,7 +130,7 @@ export default function Services() {
         </div>
 
         {/* Bottom Switcher: Compact Nav Tabs */}
-        <div className=" flex flex-nowrap lg:flex-wrap items-center justify-start sm:justify-center gap-2 sm:gap-6 overflow-x-auto no-scrollbar pt-4 pb-6 sm:pb-0 px-4 sm:px-0">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-6 pt-4 pb-6 sm:pb-0 px-4 sm:px-0">
           {services.map((service, index) => (
             <motion.button
               key={service.id}

@@ -43,29 +43,48 @@ export default function ContactFormSection() {
     return newErrors;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors = validate();
     setErrors(newErrors);
     
     if (Object.keys(newErrors).length === 0) {
       setIsSubmitting(true);
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setIsSuccess(true);
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          company: "",
-          service: "",
-          otherService: "",
-          message: "",
-          privacy: false
+      
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
         });
-        setTimeout(() => setIsSuccess(false), 5000);
-      }, 2000);
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setIsSuccess(true);
+          setFormData({
+            firstName: "",
+            lastName: "",
+            email: "",
+            company: "",
+            service: "",
+            otherService: "",
+            message: "",
+            privacy: false
+          });
+          // Auto-hide success message after 5 seconds
+          setTimeout(() => setIsSuccess(false), 5000);
+        } else {
+          // Handle server-side errors
+          setErrors({ submit: data.error || "Failed to send message. Please try again." });
+        }
+      } catch (err) {
+        setErrors({ submit: "A network error occurred. Please check your connection." });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -276,6 +295,18 @@ export default function ContactFormSection() {
                     </div>
                     {errors.privacy && <p className="text-[10px] text-red-500 pl-1">{errors.privacy}</p>}
                   </motion.div>
+
+                  <AnimatePresence>
+                    {errors.submit && (
+                      <motion.p 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-xs text-red-500 pl-1 font-semibold"
+                      >
+                        {errors.submit}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
 
                   <motion.button 
                     variants={fadeInUp}
